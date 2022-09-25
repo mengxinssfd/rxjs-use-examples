@@ -2,9 +2,103 @@
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
-    <title>example-1</title>
+    <title>拖拽</title>
+    <style>
+      * {
+        user-select: none;
+      }
+      .box {
+        transform: translate(10px, 10px);
+        transition: 0.05s transform ease-out;
+        width: 40px;
+        height: 40px;
+        background: orange;
+        border: 5px solid red;
+        cursor: pointer;
+      }
+
+      .blink {
+        animation: 0.4s linear blinking;
+      }
+
+      @keyframes blinking {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .boxes .box {
+        position: absolute;
+        transform: translate(10px, 10px);
+        /* js本来就有延时了 */
+        /* transition: 0.1s transform ease-out; */
+        transition: none;
+        width: 40px;
+        height: 40px;
+        background: #ffa500;
+        cursor: pointer;
+        border: none;
+      }
+      .boxes .box:nth-child(1) {
+        background: #f00;
+        z-index: 100;
+      }
+      .boxes .box:nth-child(2) {
+        background: #ffa500;
+        z-index: 99;
+        pointer-events: none;
+      }
+      .boxes .box:nth-child(3) {
+        background: #ff0;
+        z-index: 98;
+        pointer-events: none;
+      }
+      .boxes .box:nth-child(4) {
+        background: #008000;
+        z-index: 97;
+        pointer-events: none;
+      }
+      .boxes .box:nth-child(5) {
+        background: #0ff;
+        z-index: 96;
+        pointer-events: none;
+      }
+      .boxes .box:nth-child(6) {
+        background: #00f;
+        z-index: 95;
+        pointer-events: none;
+      }
+      .boxes .box:nth-child(7) {
+        background: #800080;
+        z-index: 94;
+        pointer-events: none;
+      }
+    </style>
   </head>
   <body>
+    <h1>例1：简单的拖拽</h1>
+    <div class="box example-1"></div>
+
+    <h1>例2：延迟拖拽(长按0.5秒后可拖拽)</h1>
+    <div class="box example-2"></div>
+
+    <h1>例3：拖拽接龙</h1>
+    <div class="boxes">
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+    </div>
+
     <script src="index.ts" type="module"></script>
   </body>
 </html>

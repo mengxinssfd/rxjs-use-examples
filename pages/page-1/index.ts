@@ -1,2 +1,3 @@
-console.log('im page-1');
-alert('hello world');
+import './src/simple';
+import './src/delay';
+import './src/solitaire';
