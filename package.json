@@ -1,7 +1,7 @@
 {
-  "name": "examples-starter",
+  "name": "rxjs-use-examples",
   "version": "0.0.0",
-  "description": "一个基于pnpm monorepo、vue3、vite、多页的快速启动模版，主要用于写一些例子等",
+  "description": "rxjs使用案例",
   "scripts": {
     "dev": "vite --port 8080",
     "check-deps": "ncu",
@@ -24,18 +24,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mengxinssfd/examples-starter.git"
+    "url": "git+https://github.com/mengxinssfd/rxjs-use-examples.git"
   },
   "keywords": [
-    "vue3",
-    "starter"
+    "rxjs",
+    "examples"
   ],
   "author": "DYH",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mengxinssfd/examples-starter/issues"
+    "url": "https://github.com/mengxinssfd/rxjs-use-examples/issues"
   },
-  "homepage": "https://github.com/mengxinssfd/examples-starter#readme",
+  "homepage": "https://github.com/mengxinssfd/rxjs-use-examples#readme",
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
