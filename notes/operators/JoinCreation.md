@@ -358,8 +358,8 @@ merged.subscribe((x) => console.log(x));
 
   - 设置同步数量后，剩余`Observable`必须等前面的所有同步`Observable`执行完毕后才会执行
 
-  - 如果最后一个数字是 1，那么和`concat`一样
+  - 如果最后一个数字是 1，那么和`concat`一样，是按照参数顺序执行的
 
-  - 非异步`Observable`最后一个参数时数字时无效
+  - 非异步`Observable`最后一个参数是数字时无效
 
   - 省略同步数量参数时，默认同步数量为参数数量之和
