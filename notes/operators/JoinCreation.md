@@ -2,19 +2,13 @@
 
 这些是 Observable 的创建操作符，它们也具有联结功能 —— 发出多个源 Observable 的值。
 
-- [`combineLatest`](https://rxjs.dev/api/index/function/combineLatest)
-
-- [`concat`](https://rxjs.dev/api/index/function/concat)
-
-- [`forkJoin`](https://rxjs.dev/api/index/function/forkJoin)
-
-- [`merge`](https://rxjs.dev/api/index/function/merge)
-
-- [`partition`](https://rxjs.dev/api/index/function/partition)
-
-- [`race`](https://rxjs.dev/api/index/function/race)
-
-- [`zip`](https://rxjs.dev/api/index/function/zip)
+- [x] [`combineLatest`](https://rxjs.dev/api/index/function/combineLatest)
+- [x] [`concat`](https://rxjs.dev/api/index/function/concat)
+- [x] [`forkJoin`](https://rxjs.dev/api/index/function/forkJoin)
+- [x] [`merge`](https://rxjs.dev/api/index/function/merge)
+- [~~`partition`~~](https://rxjs.dev/api/index/function/partition)见转换操作符
+- [~~`race`~~](https://rxjs.dev/api/index/function/race)相当于`Promise.race`
+- [x] [`zip`](https://rxjs.dev/api/index/function/zip)
 
 ## [combineLatest](https://rxjs.dev/api/index/function/combineLatest)
 
@@ -125,9 +119,7 @@ bmi.subscribe((x) => console.log('BMI is ' + x));
 规律：
 
 - 必须等每一个`Observable`都触发过后才会触发外部订阅，同一个`Observable`会顶替掉之前的值，并缓存当前值
-
 - 如果前面的`Observable`是一个已完成的`Observable`（非异步的都是已完成的），那么它的值将永远是最后一个发出的值
-
 - 如果每一个`Observable`都发送过值，那么后面每个`Observable`发送值都会触发外部订阅，其他值是`Observable`缓存的至今最后一个发送的值
 
 ## [concat](https://rxjs.dev/api/index/function/concat)
@@ -353,13 +345,80 @@ merged.subscribe((x) => console.log(x));
 与`concat`类似，都是把多个`Observable`合成一个，不过有几点不同：
 
 - `merge`的合并后的`Observable`的序列不一定是`merge`参数的顺序，顺序是实际运行时确定的；
-
 - `merge`最后一个参数是数字时，可以设置同步执行`Observable`的数量
 
   - 设置同步数量后，剩余`Observable`必须等前面的所有同步`Observable`执行完毕后才会执行
-
   - 如果最后一个数字是 1，那么和`concat`一样，是按照参数顺序执行的
-
   - 非异步`Observable`最后一个参数是数字时无效
-
   - 省略同步数量参数时，默认同步数量为参数数量之和
+
+## [zip](https://rxjs.dev/api/index/function/zip)
+
+组合多个 Observable 以创建一个 Observable，其值是按顺序从其每个输入 Observable 的值中计算出来的。
+
+如果最后一个参数是函数，则此函数用于根据输入值计算要创建的值。否则，返回输入值数组
+
+### 例子
+
+组合不同来源的年龄和姓名
+
+```typescript
+import { of, zip, map } from 'rxjs';
+
+const age$ = of(27, 25, 29);
+const name$ = of('Foo', 'Bar', 'Beer');
+const isDev$ = of(true, true, false);
+
+zip(age$, name$, isDev$)
+  .pipe(map(([age, name, isDev]) => ({ age, name, isDev })))
+  .subscribe((x) => console.log(x));
+
+// Outputs
+// { age: 27, name: 'Foo', isDev: true }
+// { age: 25, name: 'Bar', isDev: true }
+// { age: 29, name: 'Beer', isDev: false }
+```
+
+最后一个参数改为函数，代替`pipe`和`map`操作符
+
+```typescript
+import { of, zip } from 'rxjs';
+
+const age$ = of(27, 25, 29);
+const name$ = of('Foo', 'Bar', 'Beer');
+const isDev$ = of(true, true, false);
+
+zip(age$, name$, isDev$, (age, name, isDev) => ({ age, name, isDev })).subscribe((x) =>
+  console.log(x),
+);
+
+// Outputs
+// { age: 27, name: 'Foo', isDev: true }
+// { age: 25, name: 'Bar', isDev: true }
+// { age: 29, name: 'Beer', isDev: false }
+```
+
+异步
+
+```typescript
+import { zip, interval, take } from 'rxjs';
+
+const i1 = interval(1000).pipe(take(10));
+const i2 = interval(500).pipe(take(3));
+const i3 = interval(2000).pipe(take(20));
+
+zip(i1, i2, i3).subscribe((x) => console.log(x));
+
+// outputs
+// [0, 0, 0] // 会等待最慢的i3发出才会触发外部订阅
+// [1, 1, 1]
+// [2, 2, 2]
+```
+
+### 笔记
+
+与`combineLatest`有点相似，会把 `zip` 所有的参数按照发出顺序和参数顺序组合成为一个数组发出。
+
+如果最后一个参数是函数，则此函数用于根据输入值计算要创建的值。否则，返回输入值数组，约等于`pipe(map(...))`。
+
+如果`zip`接收的是异步`Observable`的话，它会等待当前序列中最慢的那个`Observable`调用`next`后，才会触发外部订阅。
