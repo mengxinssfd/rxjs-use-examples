@@ -1,5 +1,147 @@
 # [转换操作符(Transformation Operators)](https://rxjs.dev/guide/operators#transformation-operators)
 
+- [x] [`buffer`](https://rxjs.dev/api/operators/buffer)
+
+- [x] [`bufferCount`](https://rxjs.dev/api/operators/bufferCount)
+
+- [ ] [`bufferTime`](https://rxjs.dev/api/operators/bufferTime)
+
+- [ ] [`bufferToggle`](https://rxjs.dev/api/operators/bufferToggle)
+
+- [ ] [`bufferWhen`](https://rxjs.dev/api/operators/bufferWhen)
+
+- [ ] [`concatMap`](https://rxjs.dev/api/operators/concatMap)
+
+- [ ] [`concatMapTo`](https://rxjs.dev/api/operators/concatMapTo)
+
+- [ ] [`exhaust`](https://rxjs.dev/api/operators/exhaust)
+
+- [ ] [`exhaustMap`](https://rxjs.dev/api/operators/exhaustMap)
+
+- [ ] [`expand`](https://rxjs.dev/api/operators/expand)
+
+- [ ] [`groupBy`](https://rxjs.dev/api/operators/groupBy)
+
+- [x] [`map`](https://rxjs.dev/api/operators/map)
+
+- [ ] [`mapTo`](https://rxjs.dev/api/operators/mapTo)
+
+- [x] [`mergeMap`](https://rxjs.dev/api/operators/mergeMap)
+
+- [ ] [`mergeMapTo`](https://rxjs.dev/api/operators/mergeMapTo)
+
+- [ ] [`mergeScan`](https://rxjs.dev/api/operators/mergeScan)
+
+- [ ] [`pairwise`](https://rxjs.dev/api/operators/pairwise)
+
+- [x] [`partition`](https://rxjs.dev/api/operators/partition)
+
+- [ ] [`pluck`](https://rxjs.dev/api/operators/pluck)
+
+- [ ] [`scan`](https://rxjs.dev/api/operators/scan)
+
+- [ ] [`switchScan`](https://rxjs.dev/api/operators/switchScan)
+
+- [x] [`switchMap`](https://rxjs.dev/api/operators/switchMap)
+
+- [ ] [`switchMapTo`](https://rxjs.dev/api/operators/switchMapTo)
+
+- [ ] [`window`](https://rxjs.dev/api/operators/window)
+
+- [ ] [`windowCount`](https://rxjs.dev/api/operators/windowCount)
+
+- [ ] [`windowTime`](https://rxjs.dev/api/operators/windowTime)
+
+- [ ] [`windowToggle`](https://rxjs.dev/api/operators/windowToggle)
+
+- [ ] [`windowWhen`](https://rxjs.dev/api/operators/windowWhen)
+
+## [buffer](https://rxjs.dev/api/operators/buffer)
+
+> 缓冲源 Observable 的值，直到 closingNotifier 发出了值才继续。
+
+_将已过去的值收集为一个数组，并仅当另一个 Observable 发出了值后才发送该数组。_
+
+buffer(closingNotifier: Observable): OperatorFunction\<T, T\[]>
+
+### 参数
+
+| closingNotifier | 一个 Observable，它指示何时要在输出 Observable 上发送缓冲区。 |
+| :-------------- | :------------------------------------------------------------ |
+
+### 返回值
+
+一个返回 Observable 的函数，该 Observable 的值是一些缓冲区构成的数组。
+
+### 弹珠图
+
+![](https://rxjs.tech/assets/images/marble-diagrams/buffer.png)
+
+缓冲传入的 `Observable` 值，直到给定的 `closingNotifier` `Observable` 发出了一个值，此时它会在输出 `Observable` 上发送缓冲区并在内部启动一个新的缓冲区，等待 `closingNotifier` 发出下一个值。
+
+### 例子
+
+每次点击时，发送最近间隔期间所有事件的数组
+
+```typescript
+import { fromEvent, interval, buffer } from 'rxjs';
+
+const clicks = fromEvent(document, 'click');
+const intervalEvents = interval(1000);
+const buffered = intervalEvents.pipe(buffer(clicks));
+buffered.subscribe((x) => console.log(x));
+```
+
+### 笔记
+
+`buffer`需要两个`Observable`，一个`Observable`用于累计收集到数组，一个`Observable`用于触发外部订阅并把之前收集到的数据发出，并重置累计数组。
+
+## [bufferCount](https://rxjs.dev/api/operators/bufferCount)
+
+> 缓冲源 Observable 值，直到大小达到给定的最大 `bufferSize`。
+
+> _将过去的值收集为一个数组，并仅在其大小达到 `bufferSize` 时发送该数组。_
+
+### 弹珠图
+
+![](https://rxjs.tech/assets/images/marble-diagrams/bufferCount.png)
+
+通过 `bufferSize` 缓冲来自源 Observable 的多个值，然后发送缓冲区并清除它，并且每过 `startBufferEvery` 次就启动一个新缓冲区。如果 `startBufferEvery` 未提供或为 `null`，则新缓冲区会在源开始处以及每个缓冲区关闭并发送时启动新缓冲区。
+
+### 参数
+
+| bufferSize       | 发送的缓冲区的最大大小。                                                                                                                                                  |
+| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| startBufferEvery | 可选。默认值为`null`。用于开始新缓冲区的时间间隔。例如，如果 startBufferEvery 是 2 ，那么将在源的每个其他值上启动一个新缓冲区。默认情况下，会在源的开头启动一个新缓冲区。 |
+
+### 例子
+
+将最后两个点击事件作为数组进行发送
+
+```typescript
+import { fromEvent, bufferCount } from 'rxjs';
+
+const clicks = fromEvent(document, 'click');
+const buffered = clicks.pipe(bufferCount(2));
+buffered.subscribe((x) => console.log(x));
+```
+
+每次单击时，将最后两个单击事件作为数组发送
+
+```typescript
+import { fromEvent, bufferCount } from 'rxjs';
+
+const clicks = fromEvent(document, 'click');
+const buffered = clicks.pipe(bufferCount(2, 1));
+buffered.subscribe((x) => console.log(x));
+```
+
+### 笔记
+
+跟`buffer`类似，不过需要`bufferCount`设置缓冲区大小，只有缓冲区满了才会触发外部订阅。
+
+还可以设置缓冲区满了后间隔多少个才触发外部订阅，默认是缓冲区多大就间隔多少个，也可以设置为 1 个，那样缓冲区满了以后每次都是发出最后两个，也可以设置更多个。
+
 ## [map](https://rxjs.dev/api/operators/map)
 
 > 与 [Array.prototype.map()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map) 一样，它会针对传入的每个源值调用转换函数，以获取相应的输出值。
@@ -29,8 +171,7 @@ positions.subscribe((x) => console.log(x));
 
 > 将源 Observable 拆分为两个，一个具有满足此谓词的值，另一个具有不满足此谓词的值。
 >
->> *它类似于 [`filter`](https://rxjs.tech/api/operators/filter)，但会返回两个 Observable：一个类似于 [`filter`](https://rxjs.tech/api/operators/filter) 的输出，另一个则具有不满足条件的值。*
->>
+> > _它类似于 [`filter`](https://rxjs.tech/api/operators/filter)，但会返回两个 Observable：一个类似于 [`filter`](https://rxjs.tech/api/operators/filter) 的输出，另一个则具有不满足条件的值。_
 
 ### 弹珠图
 
@@ -65,7 +206,7 @@ clicksElsewhere.subscribe((x) => console.log('Other clicked: ', x));
 
 > 将每个源值投影到一个 Observable，该 Observable 会合并到输出 Observable 中，仅从最近投影的 Observable 中发出值。
 
-> *将每个值映射到一个 Observable，然后展平所有这些内部 Observable。*
+> _将每个值映射到一个 Observable，然后展平所有这些内部 Observable。_
 
 ### 弹珠图
 
@@ -186,7 +327,7 @@ if (x > 10) sub.unsubscribe();
 
 > 将每个源值投影到一个 Observable，该 Observable 会被合并到输出 Observable 中。 &#x20;
 
-> *将每个值映射到一个 Observable，然后使用 [`mergeAll`](https://rxjs.tech/api/index/function/mergeAll) 展平所有这些内部 Observable。*
+> _将每个值映射到一个 Observable，然后使用 [`mergeAll`](https://rxjs.tech/api/index/function/mergeAll) 展平所有这些内部 Observable。_
 
 ### 弹珠图
 
@@ -237,8 +378,7 @@ result.subscribe((x) => console.log(x));
 
 两者之间的区别：
 
-
 |                            | mergeMap     | switchMap      |
-| :--------------------------- | :------------- | :--------------- |
+| :------------------------- | :----------- | :------------- |
 | 是否等待 interval 一起启动 | 是           | 否             |
 | 遍历结束后循环方式         | 重新开始遍历 | 只保留最后一位 |

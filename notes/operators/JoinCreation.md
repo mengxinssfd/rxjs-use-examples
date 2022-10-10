@@ -247,7 +247,7 @@ observable.subscribe({
 
 ### 笔记
 
-功能类似`Promise.prototype.all`，都是等待所有的 item 完成后才把结果按原数组顺序输出。
+功能类似`Promise.all`，都是等待所有的 item 完成后才把结果按原数组顺序输出。
 
 跟 [`combineLatest`](https://rxjs.tech/api/index/function/combineLatest) 区别：[`combineLatest`](https://rxjs.tech/api/index/function/combineLatest) 在满足所有都发送过一次的条件后会发送每个间隔后的所有值，是连续性的；`forkJoin`只会发送最后的值。
 
