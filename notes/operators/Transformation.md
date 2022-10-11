@@ -20,7 +20,7 @@
 
 - [ ] [`expand`](https://rxjs.dev/api/operators/expand)
 
-- [ ] [`groupBy`](https://rxjs.dev/api/operators/groupBy)
+- [x] [`groupBy`](https://rxjs.dev/api/operators/groupBy)
 
 - [x] [`map`](https://rxjs.dev/api/operators/map)
 
@@ -378,7 +378,87 @@ result.subscribe((x) => console.log(x));
 
 两者之间的区别：
 
-|                            | mergeMap     | switchMap      |
-| :------------------------- | :----------- | :------------- |
-| 是否等待 interval 一起启动 | 是           | 否             |
-| 遍历结束后循环方式         | 重新开始遍历 | 只保留最后一位 |
+|                                             | mergeMap     | switchMap                                                                        |
+| :------------------------------------------ | :----------- | :------------------------------------------------------------------------------- |
+| 是否等待 interval 一起启动                  | 是           | 否                                                                               |
+| 如果接收的参数是 `Observable`，见 `groupBy` | 正常发送     | 停止从之前发送的内部 `Observable` 中发送条目，并开始从新的 `Observable` 发送条目 |
+| 遍历结束后循环方式                          | 重新开始遍历 | 只保留最后一位                                                                   |
+
+## &#x20;[groupBy](https://rxjs.dev/api/operators/groupBy)
+
+根据指定的标准对 Observable 发送的条目进行分组，并将这些分组后的条目作为 `GroupedObservables` 发送，每组都对应一个 [`GroupedObservable`](https://rxjs.tech/api/index/interface/GroupedObservable)。
+
+### 弹珠图
+
+![](https://rxjs.tech/assets/images/marble-diagrams/groupBy.png)
+
+当 Observable 发送一个条目时，使用 key 函数为这个条目计算出一个键。
+
+如果此键的 [`GroupedObservable`](https://rxjs.tech/api/index/interface/GroupedObservable) 存在，则发送此 [`GroupedObservable`](https://rxjs.tech/api/index/interface/GroupedObservable) 。否则，将为该键创建一个新的 [`GroupedObservable`](https://rxjs.tech/api/index/interface/GroupedObservable) 并发送。
+
+表示属于拥有共有键的分组的值。此共有键可用作 [`GroupedObservable`](https://rxjs.tech/api/index/interface/GroupedObservable) 实例的 `key` 字段。
+
+[`GroupedObservable`](https://rxjs.tech/api/index/interface/GroupedObservable)
+
+发送的元素默认是此 Observable 发送的条目，或是由 element 函数返回的元素。
+
+### &#x20;例子
+
+按 `id` 对一些对象进行分组并以数组形式返回
+
+```typescript
+import { of, groupBy, mergeMap, reduce } from 'rxjs';
+
+of(
+  { id: 1, name: 'JavaScript' },
+  { id: 2, name: 'Parcel' },
+  { id: 2, name: 'webpack' },
+  { id: 1, name: 'TypeScript' },
+  { id: 3, name: 'TSLint' },
+)
+  .pipe(
+    groupBy((p) => p.id),
+    mergeMap((group$) =>
+      group$.pipe(reduce((acc, cur) => [...acc, cur], [] as Array<{ id: number; name: string }>)),
+    ),
+  )
+  .subscribe((p) => console.log(p));
+
+// displays:
+// [{ id: 1, name: 'JavaScript' }, { id: 1, name: 'TypeScript'}]
+// [{ id: 2, name: 'Parcel' }, { id: 2, name: 'webpack'}]
+// [{ id: 3, name: 'TSLint' }]
+```
+
+由于`groupBy`发出的是`Observable`，所以需要`mergeMap`和`reduce`聚合起来
+
+在 `id` 字段上透视数据
+
+```typescript
+import { of, groupBy, mergeMap, reduce, map } from 'rxjs';
+
+of(
+  { id: 1, name: 'JavaScript' },
+  { id: 2, name: 'Parcel' },
+  { id: 2, name: 'webpack' },
+  { id: 1, name: 'TypeScript' },
+  { id: 3, name: 'TSLint' },
+)
+  .pipe(
+    groupBy((p) => p.id, { element: (p) => p.name }),
+    mergeMap((group$) => group$.pipe(reduce((acc, cur) => [...acc, cur], [`${group$.key}`]))),
+    map((arr) => ({ id: parseInt(arr[0], 10), values: arr.slice(1) })),
+  )
+  .subscribe((p) => console.log(p));
+
+// displays:
+// { id: 1, values: [ 'JavaScript', 'TypeScript' ] }
+// { id: 2, values: [ 'Parcel', 'webpack' ] }
+// { id: 3, values: [ 'TSLint' ] }
+```
+
+### 笔记
+
+与`lodash`的`groupBy`类似的功能，通过条件把数组中的 item 分组。
+
+`rxjs`的`groupBy`因为转换的目标是`Observable`所以如果要转数组的话要多操作一步。
