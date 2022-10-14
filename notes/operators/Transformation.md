@@ -1,59 +1,32 @@
 # [转换操作符(Transformation Operators)](https://rxjs.dev/guide/operators#transformation-operators)
 
 - [x] [`buffer`](https://rxjs.dev/api/operators/buffer)
-
 - [x] [`bufferCount`](https://rxjs.dev/api/operators/bufferCount)
-
 - [ ] [`bufferTime`](https://rxjs.dev/api/operators/bufferTime)
-
 - [ ] [`bufferToggle`](https://rxjs.dev/api/operators/bufferToggle)
-
 - [ ] [`bufferWhen`](https://rxjs.dev/api/operators/bufferWhen)
-
 - [ ] [`concatMap`](https://rxjs.dev/api/operators/concatMap)
-
 - [ ] [`concatMapTo`](https://rxjs.dev/api/operators/concatMapTo)
-
 - [ ] [`exhaust`](https://rxjs.dev/api/operators/exhaust)
-
 - [ ] [`exhaustMap`](https://rxjs.dev/api/operators/exhaustMap)
-
-- [ ] [`expand`](https://rxjs.dev/api/operators/expand)
-
+- [x] [`expand`](https://rxjs.dev/api/operators/expand)
 - [x] [`groupBy`](https://rxjs.dev/api/operators/groupBy)
-
 - [x] [`map`](https://rxjs.dev/api/operators/map)
-
 - [ ] [`mapTo`](https://rxjs.dev/api/operators/mapTo)
-
 - [x] [`mergeMap`](https://rxjs.dev/api/operators/mergeMap)
-
 - [ ] [`mergeMapTo`](https://rxjs.dev/api/operators/mergeMapTo)
-
 - [ ] [`mergeScan`](https://rxjs.dev/api/operators/mergeScan)
-
 - [ ] [`pairwise`](https://rxjs.dev/api/operators/pairwise)
-
 - [x] [`partition`](https://rxjs.dev/api/operators/partition)
-
 - [x] [`pluck`](https://rxjs.dev/api/operators/pluck)
-
 - [x] [`scan`](https://rxjs.dev/api/operators/scan)
-
 - [ ] [`switchScan`](https://rxjs.dev/api/operators/switchScan)
-
 - [x] [`switchMap`](https://rxjs.dev/api/operators/switchMap)
-
 - [ ] [`switchMapTo`](https://rxjs.dev/api/operators/switchMapTo)
-
 - [ ] [`window`](https://rxjs.dev/api/operators/window)
-
 - [ ] [`windowCount`](https://rxjs.dev/api/operators/windowCount)
-
 - [ ] [`windowTime`](https://rxjs.dev/api/operators/windowTime)
-
 - [ ] [`windowToggle`](https://rxjs.dev/api/operators/windowToggle)
-
 - [ ] [`windowWhen`](https://rxjs.dev/api/operators/windowWhen)
 
 ## [buffer](https://rxjs.dev/api/operators/buffer)
@@ -167,7 +140,7 @@ positions.subscribe((x) => console.log(x));
 
 与[Array.prototype.map()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map) 一样，所以不需要额外理解了，在此不再赘述
 
-## &#x20;[partition](https://rxjs.dev/api/operators/partition)
+## [partition](https://rxjs.dev/api/operators/partition)
 
 > 将源 Observable 拆分为两个，一个具有满足此谓词的值，另一个具有不满足此谓词的值。
 >
@@ -202,7 +175,7 @@ clicksElsewhere.subscribe((x) => console.log('Other clicked: ', x));
 
 和大部分操作符不一样，`partition`会返回两个`Observable`: `[true, false]`
 
-## &#x20;[switchMap](https://rxjs.dev/api/index/function/switchMap)
+## [switchMap](https://rxjs.dev/api/index/function/switchMap)
 
 > 将每个源值投影到一个 Observable，该 Observable 会合并到输出 Observable 中，仅从最近投影的 Observable 中发出值。
 
@@ -233,7 +206,7 @@ switched.subscribe((x) => console.log(x));
 // 27
 ```
 
-#### &#x20;例 2: 在每个点击事件上重新启动一个定期重复 Observable
+#### 例 2: 在每个点击事件上重新启动一个定期重复 Observable
 
 ```typescript
 import { fromEvent, switchMap, interval } from 'rxjs';
@@ -323,9 +296,9 @@ if (x > 10) sub.unsubscribe();
 
 在此需要注意一下
 
-## &#x20;[mergeMap](https://rxjs.dev/api/index/function/mergeMap)
+## [mergeMap](https://rxjs.dev/api/index/function/mergeMap)
 
-> 将每个源值投影到一个 Observable，该 Observable 会被合并到输出 Observable 中。 &#x20;
+> 将每个源值投影到一个 Observable，该 Observable 会被合并到输出 Observable 中。
 
 > _将每个值映射到一个 Observable，然后使用 [`mergeAll`](https://rxjs.tech/api/index/function/mergeAll) 展平所有这些内部 Observable。_
 
@@ -374,17 +347,52 @@ result.subscribe((x) => console.log(x));
 // c5
 ```
 
-可以发现这时的`x`始终是`c`&#x20;
+可以发现这时的`x`始终是`c`
 
 两者之间的区别：
 
-|                                             | mergeMap     | switchMap                                                                        |
-| :------------------------------------------ | :----------- | :------------------------------------------------------------------------------- |
-| 是否等待 interval 一起启动                  | 是           | 否                                                                               |
-| 如果接收的参数是 `Observable`，见 `groupBy` | 正常发送     | 停止从之前发送的内部 `Observable` 中发送条目，并开始从新的 `Observable` 发送条目 |
-| 遍历结束后循环方式                          | 重新开始遍历 | 只保留最后一位                                                                   |
+|                                            | mergeMap     | switchMap                                                                       |
+| :----------------------------------------- | :----------- | :------------------------------------------------------------------------------ |
+| 是否等待 interval 一起启动                 | 是           | 否                                                                              |
+| 如果接收的参数是`Observable`，见 `groupBy` | 正常发送     | 停止从之前发送的内部`Observable` 中发送条目，并开始从新的 `Observable` 发送条目 |
+| 遍历结束后循环方式                         | 重新开始遍历 | 只保留最后一位                                                                  |
 
-## &#x20;[groupBy](https://rxjs.dev/api/operators/groupBy)
+## [expand](https://rxjs.dev/api/operators/expand)
+
+> 递归地将每个源值投影为一个 Observable，该 Observable 会被合并到输出 Observable 中。
+
+> 它类似于 [`mergeMap`](https://rxjs.tech/api/operators/mergeMap)，但会将投影函数应用于每个源值以及每个输出值。它是递归的。
+
+### 弹珠图
+
+![](https://rxjs.tech/assets/images/marble-diagrams/expand.png)
+
+返回一个 Observable，该 Observable 将针对源 Observable 发出的每个条目调用某个函数，该函数会返回一个 Observable，然后合并这些结果 Observable，并发送其所有条目。_expand_ 会在输出 Observable 上重新发送每个源的每个值。然后，对每个输出值调用 `project` 函数，该函数会返回一个内部 Observable，并将其合并到输出 Observable 上。此投影产生的那些输出值也会再传给 `project` 函数以产生新的输出值。这就是 _expand_ 的递归式行为。
+
+### 例子
+
+~~每次~~(每次这个说法是不对的，使用了 `take` 就意味着达到条件后就取消了订阅，该点击事件就无效了)点击时开始发送 2 的幂，最多 10 个
+
+```typescript
+import { fromEvent, map, expand, of, delay, take } from 'rxjs';
+
+const clicks = fromEvent(document, 'click');
+const powersOfTwo = clicks.pipe(
+  map(() => 1),
+  expand((x) => of(2 * x).pipe(delay(1000))),
+  take(10),
+);
+powersOfTwo.subscribe((x) => console.log(x));
+```
+
+### 笔记
+
+感觉`expand`这个名词有点误导性，它不是扩展而是递归：
+**第一次接收上一个操作符传来的参数，然后递归接收上次递归调用的返回值**。
+
+需要注意添加递归停止条件，否则可能会导致栈溢出。
+
+## [groupBy](https://rxjs.dev/api/operators/groupBy)
 
 根据指定的标准对 Observable 发送的条目进行分组，并将这些分组后的条目作为 `GroupedObservables` 发送，每组都对应一个 [`GroupedObservable`](https://rxjs.tech/api/index/interface/GroupedObservable)。
 
@@ -402,7 +410,7 @@ result.subscribe((x) => console.log(x));
 
 发送的元素默认是此 Observable 发送的条目，或是由 element 函数返回的元素。
 
-### &#x20;例子
+### 例子
 
 按 `id` 对一些对象进行分组并以数组形式返回
 
@@ -475,19 +483,17 @@ of(
 
 该操作符会维护一个内部状态，并在处理每个值后发送它，如下所示：
 
-1.  第一个值抵达
+1. 第一个值抵达
 
 - 如果提供了 `seed` 值（作为 [`scan`](https://rxjs.tech/api/index/function/scan) 的第二个参数），则让 `state = seed` 和 `value = firstValue`。
-
 - 如果没有提供 `seed` 值（没有第二个参数），则让 `state = firstValue` 并转到 3。
 
-1.  让 `state = accumulator(state, value)`。
+1. 让 `state = accumulator(state, value)`。
 
 - 如果 `accumulator` 抛出错误，则向使用者通知一个错误。该过程结束。
 
-1.  发送 `state`。
-
-2.  下一个值抵达，让 `value = nextValue`，转到 2。
+1. 发送 `state`。
+2. 下一个值抵达，让 `value = nextValue`，转到 2。
 
 ### 例子
 
